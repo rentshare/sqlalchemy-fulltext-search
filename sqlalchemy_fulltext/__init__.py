@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-s
-import re
-import inspect
 from sqlalchemy import event
 from sqlalchemy.schema import DDL
 from sqlalchemy.orm.mapper import Mapper
@@ -16,9 +14,6 @@ MYSQL_MATCH_AGAINST = u"""
                       MATCH ({0})
                       AGAINST ({1} {2})
                       """
-
-def escape_quote(string):
-    return re.sub(r"[\"\']+", "", string)
 
 class FullTextSearch(ClauseElement):
     """
