@@ -35,8 +35,7 @@ class FullTextSearch(ClauseElement):
 def __mysql_fulltext_search(element, compiler, **kw):
 
     assert issubclass(element.model, FullText), "{0} not FullTextable".format(element.model)
-    return MYSQL_MATCH_AGAINST.format(",".join(
-                                      element.model.__fulltext_columns__),
+    return MYSQL_MATCH_AGAINST.format(",".join(('`' + element.model.__tablename__ + '`.`' + c + '`' for c in element.model.__fulltext_columns__)),
                                       compiler.process(element.against),
                                       element.mode)
 
@@ -60,15 +59,15 @@ class FullText(object):
         """
         build up fulltext index after table is created
         """
+
         if FullText not in cls.__bases__:
             return
         assert cls.__fulltext_columns__, "Model:{0.__name__} No FullText columns defined".format(cls)
-        
+
         event.listen(cls.__table__,
                      'after_create',
                      DDL(MYSQL_BUILD_INDEX_QUERY.format(cls,
-                         ", ".join((escape_quote(c)
-                                    for c in cls.__fulltext_columns__)))
+                         ", ".join('`' + cls.__tablename__ + '`.`' + c + '`' for c in cls.__fulltext_columns__))
                          )
                      )
     """
