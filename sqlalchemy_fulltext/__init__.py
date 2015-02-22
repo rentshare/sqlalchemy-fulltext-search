@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import ClauseElement
 import sqlalchemy_fulltext.modes as FullTextMode
 
 MYSQL = "mysql"
-MYSQL_BUILD_INDEX_QUERY = u"""ALTER TABLE {0.__tablename__} ADD FULLTEXT ({1})"""
+MYSQL_BUILD_INDEX_QUERY = u"""ALTER TABLE {0} ADD FULLTEXT ({1})"""
 MYSQL_MATCH_AGAINST = u"""
                       MATCH ({0})
                       AGAINST ({1} {2})
@@ -54,7 +54,7 @@ def __mysql_fulltext_search(element, compiler, **kw):
 class FullText(object):
     """
     FullText Minxin object for SQLAlchemy
-    
+
         >>> from sqlalchemy_fulltext import FullText
         >>> class Foo(FullText, Base):
         >>>     __fulltext_columns__ = ('spam', 'ham')
@@ -62,7 +62,7 @@ class FullText(object):
 
     fulltext search spam and ham now
     """
-    
+
     __fulltext_columns__ = tuple()
 
     @classmethod
@@ -76,7 +76,7 @@ class FullText(object):
 
         event.listen(cls.__table__,
                      'after_create',
-                     DDL(MYSQL_BUILD_INDEX_QUERY.format(cls,
+                     DDL(MYSQL_BUILD_INDEX_QUERY.format(cls.__table__,
                          ", ".join((escape_quote(c)
                                     for c in cls.__fulltext_columns__)))
                          )
@@ -90,7 +90,7 @@ class FullText(object):
     """
 
 
-def __build_fulltext_index(mapper, class_):    
+def __build_fulltext_index(mapper, class_):
     if issubclass(class_, FullText):
         class_.build_fulltext()
 
