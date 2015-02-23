@@ -43,7 +43,7 @@ def __mysql_fulltext_search(element, compiler, **kw):
 class FullText(object):
     """
     FullText Minxin object for SQLAlchemy
-    
+
         >>> from sqlalchemy_fulltext import FullText
         >>> class Foo(FullText, Base):
         >>>     __fulltext_columns__ = ('spam', 'ham')
@@ -51,7 +51,7 @@ class FullText(object):
 
     fulltext search spam and ham now
     """
-    
+
     __fulltext_columns__ = tuple()
 
     @classmethod
@@ -66,9 +66,8 @@ class FullText(object):
 
         event.listen(cls.__table__,
                      'after_create',
-                     DDL(MYSQL_BUILD_INDEX_QUERY.format(cls,
-                         ", ".join((escape_quote(c)
-                                    for c in cls.__fulltext_columns__)))
+                     DDL(MYSQL_BUILD_INDEX_QUERY.format(cls.__table__,
+                         ", ".join(cls.__fulltext_columns__))
                          )
                      )
     """
@@ -78,7 +77,7 @@ class FullText(object):
     def __contains__(*arg):
         return True
     """
-def __build_fulltext_index(mapper, class_):    
+def __build_fulltext_index(mapper, class_):
     if issubclass(class_, FullText):
         class_.build_fulltext()
 
